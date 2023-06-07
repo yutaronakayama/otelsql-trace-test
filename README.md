@@ -1,1 +1,1 @@
-# otelsql-exercise
+# otelsql-trace-test
