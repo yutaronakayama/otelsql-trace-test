@@ -8,12 +8,17 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/uptrace/opentelemetry-go-extra/otelsql"
-	"github.com/yutaronakayama/otelsql-trace-test/domain"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
+
+type User struct {
+	UserID int    `db:"user_id"`
+	Name   string `db:"name"`
+	Email  string `db:"email"`
+}
 
 func initTracer() func() {
 	// Jaegerへトレース情報を送るためのエクスポータの作成
@@ -40,6 +45,15 @@ func initTracer() func() {
 	}
 }
 
+func selectUsers(ctx context.Context, db *sqlx.DB) ([]User, error) {
+	var users []User
+	err := db.SelectContext(ctx, &users, "SELECT user_id, name, email FROM users")
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
 func main() {
 	shutdown := initTracer()
 	defer shutdown()
@@ -58,8 +72,7 @@ func main() {
 	sqlxDB := sqlx.NewDb(db, "mysql")
 
 	// ユーザテーブル情報を取得
-	type UserRepo domain.UserRepository
-	users, err := UserRepo.SelectUsers(ctx, sqlxDB)
+	users, err := selectUsers(ctx, sqlxDB)
 	if err != nil {
 		fmt.Errorf("failed to select users: %v", err)
 	}

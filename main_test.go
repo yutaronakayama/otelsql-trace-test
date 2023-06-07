@@ -1,4 +1,4 @@
-package repository
+package main
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"github.com/yutaronakayama/otelsql-trace-test/domain"
 )
 
 func Test_selectUsers(t *testing.T) {
@@ -18,14 +17,14 @@ func Test_selectUsers(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    []domain.User
+		want    []User
 		wantErr bool
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := SelectUsers(tt.args.ctx, tt.args.db)
+			got, err := selectUsers(tt.args.ctx, tt.args.db)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("selectUsers() error = %v, wantErr %v", err, tt.wantErr)
 				return
