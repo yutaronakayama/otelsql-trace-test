@@ -21,7 +21,7 @@ type User struct {
 }
 
 func initTracer() func() {
-	// Set the Jaeger exporter to send traces to the Jaeger instance.
+	// Jaegerへトレース情報を送るためのエクスポータの作成
 	exporter, err := jaeger.New(
 		jaeger.WithCollectorEndpoint(jaeger.WithEndpoint("http://localhost:14268/api/traces")),
 	)
@@ -29,15 +29,13 @@ func initTracer() func() {
 		log.Fatal(err)
 	}
 
-	// Configure the trace provider with the Jaeger exporter and a sampler that always samples.
+	// トレースプロバイダの設定
 	bsp := sdktrace.NewBatchSpanProcessor(exporter)
 	tp := sdktrace.NewTracerProvider(
 		sdktrace.WithSpanProcessor(bsp),
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
 	)
 	otel.SetTracerProvider(tp)
-
-	// Set the propagators for the global OpenTelemetry configuration.
 	otel.SetTextMapPropagator(propagation.TraceContext{})
 
 	return func() {
