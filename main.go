@@ -8,6 +8,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/uptrace/opentelemetry-go-extra/otelsql"
+	"github.com/yutaronakayama/otelsql-trace-test/domain"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/propagation"
@@ -57,7 +58,8 @@ func main() {
 	sqlxDB := sqlx.NewDb(db, "mysql")
 
 	// ユーザテーブル情報を取得
-	users, err := repository.selectUsers(ctx, sqlxDB)
+	type UserRepo domain.UserRepository
+	users, err := UserRepo.SelectUsers(ctx, sqlxDB)
 	if err != nil {
 		fmt.Errorf("failed to select users: %v", err)
 	}

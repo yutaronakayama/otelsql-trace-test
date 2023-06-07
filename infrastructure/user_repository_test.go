@@ -25,7 +25,7 @@ func Test_selectUsers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := selectUsers(tt.args.ctx, tt.args.db)
+			got, err := SelectUsers(tt.args.ctx, tt.args.db)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("selectUsers() error = %v, wantErr %v", err, tt.wantErr)
 				return
