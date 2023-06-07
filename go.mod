@@ -1,4 +1,4 @@
-module github.com/takashabe/otelsql-exercise
+module github.com/yutaronakayama/otelsql-trace-test
 
 go 1.20
 
