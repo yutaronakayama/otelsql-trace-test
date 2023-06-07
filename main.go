@@ -14,12 +14,6 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
-type User struct {
-	UserID int    `db:"user_id"`
-	Name   string `db:"name"`
-	Email  string `db:"email"`
-}
-
 func initTracer() func() {
 	// Jaegerへトレース情報を送るためのエクスポータの作成
 	exporter, err := jaeger.New(
@@ -63,10 +57,9 @@ func main() {
 	sqlxDB := sqlx.NewDb(db, "mysql")
 
 	// ユーザテーブル情報を取得
-	var users []User
-	err = sqlxDB.SelectContext(ctx, &users, "SELECT user_id, name, email FROM users")
+	users, err := repository.selectUsers(ctx, sqlxDB)
 	if err != nil {
-		log.Fatalf("failed to query users table: %v", err)
+		fmt.Errorf("failed to select users: %v", err)
 	}
 
 	for _, user := range users {
