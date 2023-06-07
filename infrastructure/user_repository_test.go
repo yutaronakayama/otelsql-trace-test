@@ -7,7 +7,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"github.com/nakayamayutaro/otelsql-trace-test/domain"
+	"github.com/yutaronakayama/otelsql-trace-test/domain"
 )
 
 func Test_selectUsers(t *testing.T) {
