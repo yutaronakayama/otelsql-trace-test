@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jmoiron/sqlx"
 	"github.com/uptrace/opentelemetry-go-extra/otelsql"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/jaeger"
@@ -15,7 +15,7 @@ import (
 )
 
 type User struct {
-	UserID int    `db:"user_id"`
+	UserID int    `db:"id"`
 	Name   string `db:"name"`
 	Email  string `db:"email"`
 }
@@ -45,20 +45,30 @@ func initTracer() func() {
 	}
 }
 
-func selectUsers(ctx context.Context, db *sqlx.DB) ([]User, error) {
-	var users []User
-	err := db.SelectContext(ctx, &users, "SELECT user_id, name, email FROM users")
+func selectUsers(db *sql.DB) ([]*User, error) {
+	fmt.Println("selectUserByUserID")
+	fmt.Println("QueryRow")
+	users, err := db.Query("SELECT id, name, email FROM users")
 	if err != nil {
 		return nil, err
 	}
-	return users, nil
+	defer users.Close()
+
+	ret := []*User{}
+	for users.Next() {
+		user := &User{}
+		if err := users.Scan(&user.UserID, &user.Name, &user.Email); err != nil {
+			return nil, err
+		}
+		ret = append(ret, user)
+	}
+	fmt.Println("QueryRow")
+	return ret, nil
 }
 
 func main() {
 	shutdown := initTracer()
 	defer shutdown()
-
-	ctx := context.Background()
 
 	// MySQLデータベースへの接続
 	dsn := "root:@tcp(localhost:3306)/otelsql?parseTime=true"
@@ -68,16 +78,10 @@ func main() {
 	}
 	defer db.Close()
 
-	// 取得したデータベース情報をsqlxでラップ
-	sqlxDB := sqlx.NewDb(db, "mysql")
-
-	// ユーザテーブル情報を取得
-	users, err := selectUsers(ctx, sqlxDB)
+	// ユーザ情報を取得
+	users, err := selectUsers(db)
 	if err != nil {
 		fmt.Errorf("failed to select users: %v", err)
 	}
-
-	for _, user := range users {
-		fmt.Printf("User ID: %d, Name: %s, Email: %s\n", user.UserID, user.Name, user.Email)
-	}
+	fmt.Println(users)
 }
