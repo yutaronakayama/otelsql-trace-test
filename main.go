@@ -46,8 +46,6 @@ func initTracer() func() {
 }
 
 func selectUsers(db *sql.DB) ([]*User, error) {
-	fmt.Println("selectUserByUserID")
-	fmt.Println("QueryRow")
 	users, err := db.Query("SELECT id, name, email FROM users")
 	if err != nil {
 		return nil, err
@@ -62,7 +60,6 @@ func selectUsers(db *sql.DB) ([]*User, error) {
 		}
 		ret = append(ret, user)
 	}
-	fmt.Println(ret)
 	return ret, nil
 }
 

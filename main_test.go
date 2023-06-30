@@ -10,7 +10,8 @@ import (
 )
 
 func Test_selectUsers(t *testing.T) {
-	initTracer()
+	shutdown := initTracer()
+	defer shutdown()
 	dsn := "root:@tcp(localhost:3306)/otelsql?parseTime=true"
 	db, err := otelsql.Open("mysql", dsn)
 	if err != nil {
@@ -23,7 +24,7 @@ func Test_selectUsers(t *testing.T) {
 		want []*User
 	}{
 		{
-			name: "問題なくUser情報が取得できること",
+			name: "work",
 			want: []*User{
 				{
 					UserID: 1,
