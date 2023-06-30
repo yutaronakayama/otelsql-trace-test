@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"testing"
 
@@ -11,6 +10,7 @@ import (
 )
 
 func Test_selectUsers(t *testing.T) {
+	initTracer()
 	dsn := "root:@tcp(localhost:3306)/otelsql?parseTime=true"
 	db, err := otelsql.Open("mysql", dsn)
 	if err != nil {
@@ -40,15 +40,9 @@ func Test_selectUsers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, _ := selectUsers(db)
-			fmt.Println(got)
-			// fmt.Printf("got: %v", got)
-			// fmt.Printf("want: %v", tt.want)
+			got, err := selectUsers(db)
+			assert.NoError(t, err)
 			assert.ElementsMatch(t, tt.want, got)
-			// assert.Equal(t, v.UserID, tt.want.UserID)
-			// assert.Equal(t, v.Name, tt.want.Name)
-			// assert.Equal(t, v.Email, tt.want.Email)
-
 		})
 	}
 }

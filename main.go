@@ -62,7 +62,7 @@ func selectUsers(db *sql.DB) ([]*User, error) {
 		}
 		ret = append(ret, user)
 	}
-	fmt.Println("QueryRow")
+	fmt.Println(ret)
 	return ret, nil
 }
 
@@ -81,7 +81,7 @@ func main() {
 	// ユーザ情報を取得
 	users, err := selectUsers(db)
 	if err != nil {
-		fmt.Errorf("failed to select users: %v", err)
+		log.Fatalf("failed to select users: %v", err)
 	}
 	fmt.Println(users)
 }
